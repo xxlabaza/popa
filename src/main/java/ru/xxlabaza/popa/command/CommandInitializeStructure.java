@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,10 +58,10 @@ class CommandInitializeStructure extends AbstractCommand {
     @SneakyThrows
     private void createFolder (Path path) {
         if (Files.exists(path)) {
-            log.warn("Folder \"{}\" already exists", path.getFileName());
+            log.warn("Folder '{}' already exists", path);
             return;
         }
         Files.createDirectories(path);
-        log.info("Folder \"{}\" was created", path.getFileName());
+        log.info("Folder '{}' was created", path);
     }
 }

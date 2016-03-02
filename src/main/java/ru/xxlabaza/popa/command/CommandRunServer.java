@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -82,7 +82,7 @@ class CommandRunServer extends AbstractCommand {
         handlers.setHandlers(new Handler[] {
             createAssetsHandler(),
             createContentHandler(),
-            createProxyServlet()
+            createProxyServlet(port)
         });
         server.setHandler(handlers);
 
@@ -117,16 +117,21 @@ class CommandRunServer extends AbstractCommand {
         return contentHandler;
     }
 
-    private Handler createProxyServlet () {
+    private Handler createProxyServlet (int port) {
         if (proxy == null || proxy.getTo() == null) {
             return new DefaultHandler();
         }
+
+        val prefix = !proxy.getPrefix().startsWith("/")
+                     ? "/" + proxy.getPrefix()
+                     : proxy.getPrefix();
+
         log.info("Proxy settings were found");
-        log.info("Redirects all requests from path '{}' to {}", proxy.getPrefix(), proxy.getTo());
+        log.info("Redirects all requests from 'http://localhost:{}{}' to '{}'", port, prefix, proxy.getTo());
 
         val proxyServletHolder = new ServletHolder(ProxyServlet.Transparent.class);
         proxyServletHolder.setInitParameter("proxyTo", proxy.getTo().toString());
-        proxyServletHolder.setInitParameter("prefix", proxy.getPrefix());
+        proxyServletHolder.setInitParameter("prefix", prefix);
 
         val servletContextHandler = new ServletContextHandler(NO_SESSIONS | NO_SECURITY);
         servletContextHandler.setContextPath("/");

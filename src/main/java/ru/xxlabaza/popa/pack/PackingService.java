@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 package ru.xxlabaza.popa.pack;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.jsoup.Jsoup;
@@ -69,10 +70,16 @@ public class PackingService {
         return processHtml(document.toString());
     }
 
+    private Path createPath (String path) {
+        return path.startsWith("/")
+               ? Paths.get(path.substring(1))
+               : Paths.get(path);
+    }
+
     private void processCss (Document document) {
         document.select("link[rel=stylesheet]:not([href^=http]):not([id]):not([class])").forEach(link -> {
-            String href = link.attr("href");
-            String content = commentRemoveService.removeComments(build.resolve(href));
+            Path path = createPath(link.attr("href"));
+            String content = commentRemoveService.removeComments(build.resolve(path));
             content = compressService.compress(content, CSS);
 
             Element style = document.createElement("style");
@@ -89,8 +96,8 @@ public class PackingService {
 
     private void processJavaScript (Document document) {
         document.select("script[src$=.js]:not([src^=http]):not([id]):not([class])").forEach(script -> {
-            String src = script.attr("src");
-            String content = commentRemoveService.removeComments(build.resolve(src));
+            Path path = createPath(script.attr("src"));
+            String content = commentRemoveService.removeComments(build.resolve(path));
             content = compressService.compress(content, JAVASCRIPT);
 
             script.removeAttr("src");

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
  */
 package ru.xxlabaza.popa;
 
-import java.net.URL;
 import java.nio.file.Path;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -68,7 +67,13 @@ public class AppProperties {
 
             private String prefix;
 
-            private URL to;
+            private String to;
+
+            public void setTo (String to) {
+                this.to = to != null && !to.startsWith("http")
+                          ? "http://" + to
+                          : to;
+            }
         }
     }
 }

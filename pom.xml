@@ -6,7 +6,7 @@
 
     <groupId>ru.xxlabaza</groupId>
     <artifactId>popa</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
     
     <parent>
@@ -64,7 +64,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.6</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         
         <dependency>
