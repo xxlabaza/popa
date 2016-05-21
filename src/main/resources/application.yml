@@ -9,15 +9,19 @@ app:
     build:      build
     assets:     assets
     compressed: compressed
+  style:
+    lineBreak: 80
 
 spring:
+  jmx:
+    enabled: false
   application.name: popa
   main.banner-mode: "off"
   freemarker:
     template-loader-path: file:./${app.folder.templates}
 
 logging:
-  pattern.console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:%5p}){magenta} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+  pattern.console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:%5p}){magenta} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
   level:
     ru.xxlabaza.jtemp:      INFO
     org.springframework:    ERROR

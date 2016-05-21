@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,9 +26,12 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.PropertyPlaceholderAutoConfiguration;
+import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import ru.xxlabaza.popa.command.Command;
 import ru.xxlabaza.popa.command.CommandPrintHelp;
 
@@ -37,7 +40,12 @@ import ru.xxlabaza.popa.command.CommandPrintHelp;
  * @since 25.02.2016
  */
 @Slf4j
-@SpringBootApplication
+@Configuration
+@Import({
+    GroovyTemplateAutoConfiguration.class,
+    PropertyPlaceholderAutoConfiguration.class,
+    AppConfiguration.class
+})
 public class Main implements CommandLineRunner {
 
     public static void main (String[] args) {
@@ -64,7 +72,7 @@ public class Main implements CommandLineRunner {
         for (Option option : commandLine.getOptions()) {
             commandsMap.get(option).execute(option.getValues());
         }
-        exit(0);
+//        exit(0);
     }
 
     private void exit (int code) {

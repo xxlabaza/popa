@@ -15,6 +15,9 @@
  */
 package ru.xxlabaza.popa.command;
 
+import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SECURITY;
+import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
+
 import java.nio.file.Path;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +38,6 @@ import ru.xxlabaza.popa.AppProperties;
 import ru.xxlabaza.popa.AppProperties.Server.Proxy;
 import ru.xxlabaza.popa.server.TemplatedResource;
 import ru.xxlabaza.popa.template.TemplaterFacade;
-
-import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SECURITY;
-import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
 
 /**
  * @author Artem Labazin <xxlabaza@gmail.com>
@@ -80,8 +80,8 @@ class CommandRunServer extends AbstractCommand {
 
         val handlers = new HandlerList();
         handlers.setHandlers(new Handler[] {
-            createAssetsHandler(),
             createContentHandler(),
+            createAssetsHandler(),
             createProxyServlet(port)
         });
         server.setHandler(handlers);

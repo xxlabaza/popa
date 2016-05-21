@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
  */
 package ru.xxlabaza.popa.pack.comment;
 
-import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 import static ru.xxlabaza.popa.pack.ContentType.HTML;
@@ -27,13 +26,27 @@ import static ru.xxlabaza.popa.pack.ContentType.HTML;
 @Service
 class CommentRemoverHtml extends AbstractCommentRemover {
 
-    private final static Pattern PATTERN;
-
-    static {
-        PATTERN = Pattern.compile("<!--(?!\\s*(?:\\[if [^\\]]+]|<!|>))(?:(?!-->)(.|\\n))*-->");
+    CommentRemoverHtml () {
+        super(HTML, "<!--");
     }
 
-    CommentRemoverHtml () {
-        super(PATTERN, HTML);
+    @Override
+    protected int checkAndShift (char currentChar, char[] chars, int currentIndex) {
+        for (int subIndex = currentIndex + 4; subIndex < chars.length; subIndex++) {
+            if (chars[subIndex] == '-' && chars[subIndex + 1] == '-' && chars[subIndex + 2] == '>') {
+                return subIndex + 2;
+            }
+        }
+        return currentIndex;
+    }
+
+    @Override
+    protected boolean isStartOfComment (char currentChar, char[] chars, int currentIndex) {
+        return super.isStartOfComment(currentChar, chars, currentIndex) && chars[currentIndex + 4] != '[';
+    }
+
+    @Override
+    protected boolean isStartOrEndOfString (char currentChar, char[] chars, int currentIndex) {
+        return false;
     }
 }

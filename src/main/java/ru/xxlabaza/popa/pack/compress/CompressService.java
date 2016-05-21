@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,8 @@
  */
 package ru.xxlabaza.popa.pack.compress;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -25,8 +27,6 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.xxlabaza.popa.pack.ContentType;
-
-import static java.util.stream.Collectors.toMap;
 
 /**
  * @author Artem Labazin <xxlabaza@gmail.com>

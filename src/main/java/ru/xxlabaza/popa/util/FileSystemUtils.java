@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ import lombok.val;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 /**
  * @author Artem Labazin <xxlabaza@gmail.com>
@@ -39,17 +40,20 @@ public final class FileSystemUtils {
                 val fromFileTime = Files.getLastModifiedTime(from);
                 val toFileTime = Files.getLastModifiedTime(to);
                 if (fromFileTime.compareTo(toFileTime) < 0) {
-                    log.info("File '{}' wasn't coppied. It has actual state", from.toString());
+                    log.debug("File '{}' wasn't coppied. It has actual state", from);
                     return;
                 }
+            } else if (!Files.exists(to.getParent())) {
+                log.debug("Directory '{}' was created", to.getParent());
+                Files.createDirectories(to.getParent());
             }
-            log.info("File '{}' was coppied", from.toString());
+            log.debug("File '{}' was coppied", from);
             Files.copy(from, to, REPLACE_EXISTING);
             return;
         }
 
         if (!Files.exists(to)) {
-            log.info("Directory '{}' was created", to.toString());
+            log.debug("Directory '{}' was created", to);
             Files.createDirectories(to);
         }
         Files.list(from).forEach(it -> copy(it, to.resolve(it.getFileName())));
@@ -92,7 +96,7 @@ public final class FileSystemUtils {
 
     @SneakyThrows
     public static void write (Path path, String content) {
-        Files.write(path, content.getBytes(), CREATE);
+        Files.write(path, content.getBytes(), CREATE, TRUNCATE_EXISTING);
     }
 
     private FileSystemUtils () {

@@ -6,13 +6,13 @@
 
     <groupId>ru.xxlabaza</groupId>
     <artifactId>popa</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.3.2.RELEASE</version>
+        <version>1.3.4.RELEASE</version>
     </parent>
     
     <name>POPA</name>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.6</version>
+            <version>1.16.8</version>
             <scope>provided</scope>
         </dependency>
         
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.8.3</version>
+            <version>1.9.1</version>
         </dependency>
         
         <dependency>

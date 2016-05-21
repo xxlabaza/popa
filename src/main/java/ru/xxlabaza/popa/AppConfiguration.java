@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,8 @@
  */
 package ru.xxlabaza.popa;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -26,16 +28,23 @@ import org.apache.commons.cli.Options;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.convert.converter.Converter;
 import ru.xxlabaza.popa.command.Command;
-
-import static java.util.stream.Collectors.toMap;
+import ru.xxlabaza.popa.command.CommandConfiguration;
+import ru.xxlabaza.popa.pack.PackConfiguration;
+import ru.xxlabaza.popa.template.TemplaterConfiguration;
 
 /**
  * @author Artem Labazin <xxlabaza@gmail.com>
  * @since 01.03.2016
  */
 @Configuration
+@Import({
+    CommandConfiguration.class,
+    PackConfiguration.class,
+    TemplaterConfiguration.class
+})
 class AppConfiguration {
 
     @Bean
@@ -54,6 +63,11 @@ class AppConfiguration {
     @ConfigurationPropertiesBinding
     public StringToPathConverter stringToPathConverter () {
         return new StringToPathConverter();
+    }
+
+    @Bean
+    AppProperties appProperties () {
+        return new AppProperties();
     }
 
     static class StringToPathConverter implements Converter<String, Path> {

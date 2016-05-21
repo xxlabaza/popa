@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
  */
 package ru.xxlabaza.popa.pack.comment;
 
-import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 import static ru.xxlabaza.popa.pack.ContentType.JAVASCRIPT;
@@ -27,15 +26,29 @@ import static ru.xxlabaza.popa.pack.ContentType.JAVASCRIPT;
 @Service
 class CommentRemoverJavaScript extends AbstractCommentRemover {
 
-    private final static Pattern PATTERN;
-
-    static {
-        PATTERN = Pattern.compile(
-                "(/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/|[\\t]*//.*)|\"(\\\\.|[^\\\\\"])*\"|'(\\\\[\\s\\S]|[^'])*'"
-        );
+    CommentRemoverJavaScript () {
+        super(JAVASCRIPT, "//", "/*");
     }
 
-    CommentRemoverJavaScript () {
-        super(PATTERN, JAVASCRIPT);
+    @Override
+    protected int checkAndShift (char currentChar, char[] chars, int currentIndex) {
+        if (chars[currentIndex + 1] == '*') {
+            int subIndex = currentIndex + 2;
+            for (; subIndex < chars.length; subIndex++) {
+                if (chars[subIndex] == '*' && chars[subIndex + 1] == '/') {
+                    break;
+                }
+            }
+            return subIndex + 1;
+        } else if (chars[currentIndex + 1] == '/') {
+            int subIndex = currentIndex + 2;
+            for (; subIndex < chars.length; subIndex++) {
+                if (chars[subIndex] == '\n') {
+                    break;
+                }
+            }
+            return subIndex - 1;
+        }
+        return currentIndex;
     }
 }

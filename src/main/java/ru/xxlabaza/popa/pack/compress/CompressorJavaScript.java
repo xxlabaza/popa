@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +20,10 @@ import java.io.Reader;
 import java.io.Writer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.xxlabaza.popa.pack.ContentType;
 
@@ -35,6 +37,9 @@ import static ru.xxlabaza.popa.pack.ContentType.JAVASCRIPT;
 @Service
 class CompressorJavaScript implements Compressor {
 
+    @Value("${app.style.lineBreak}")
+    private int lineBreak;
+
     private final ErrorReporter errorReporter;
 
     CompressorJavaScript () {
@@ -45,7 +50,7 @@ class CompressorJavaScript implements Compressor {
     @SneakyThrows
     public void compress (Reader reader, Writer writer) {
         JavaScriptCompressor compressor = new JavaScriptCompressor(reader, errorReporter);
-        compressor.compress(writer, 80, true, false, true, false);
+        compressor.compress(writer, lineBreak, false, false, true, true);
     }
 
     @Override
@@ -57,13 +62,7 @@ class CompressorJavaScript implements Compressor {
 
         @Override
         public void error (String message, String fileName, int line, String source, int offset) {
-            StringBuilder messageBuilder = new StringBuilder();
-            if (line >= 0) {
-                messageBuilder.append(line).append(':').append(offset).append(':');
-            }
-            messageBuilder.append(message);
-
-            log.error("Error in '{}' {}", fileName, messageBuilder);
+            log.error("Error in {}", createMessage(message, fileName, line, source, offset));
         }
 
         @Override
@@ -74,13 +73,16 @@ class CompressorJavaScript implements Compressor {
 
         @Override
         public void warning (String message, String fileName, int line, String source, int offset) {
-            StringBuilder messageBuilder = new StringBuilder();
-            if (line >= 0) {
-                messageBuilder.append(line).append(':').append(offset).append(':');
-            }
-            messageBuilder.append(message);
+            log.warn("Warning {}", createMessage(message, fileName, line, source, offset));
+        }
 
-            log.warn("Warning in '{}' {}", fileName, messageBuilder);
+        private String createMessage (String message, String fileName, int line, String source, int offset) {
+            val messageBuilder = new StringBuilder();
+            if (line >= 0) {
+                messageBuilder.append("in ").append(line).append(':').append(offset).append(": ");
+            }
+            messageBuilder.append(message).append('\n').append(source);
+            return messageBuilder.toString();
         }
     }
 }

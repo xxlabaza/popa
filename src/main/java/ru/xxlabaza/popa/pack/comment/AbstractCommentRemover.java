@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,7 @@
  */
 package ru.xxlabaza.popa.pack.comment;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import ru.xxlabaza.popa.pack.ContentType;
 
 /**
@@ -25,13 +24,74 @@ import ru.xxlabaza.popa.pack.ContentType;
  */
 abstract class AbstractCommentRemover implements CommentRemover {
 
-    private final Pattern pattern;
-
     private final ContentType type;
 
-    AbstractCommentRemover (Pattern pattern, ContentType type) {
-        this.pattern = pattern;
+    private final String[] startOfComment;
+
+    AbstractCommentRemover (ContentType type, String... startOfComment) {
         this.type = type;
+        this.startOfComment = startOfComment;
+    }
+
+    protected abstract int checkAndShift (char currentChar, char[] chars, int currentIndex);
+
+    @Override
+    public String removeComments (String content) {
+        StringBuilder result = new StringBuilder(content.length());
+
+        char[] chars = content.toCharArray();
+        char currentChar;
+        boolean insideString = false;
+        char startStringChar = ' ';
+        boolean insideRegex = false;
+
+        for (int index = 0; index < chars.length; index++) {
+            currentChar = chars[index];
+
+            if (!insideRegex && isStartOrEndOfString(currentChar, chars, index)) {
+                if (startStringChar == currentChar) {
+                    insideString = false;
+                    startStringChar = ' ';
+                } else if (!insideString) {
+                    insideString = true;
+                    startStringChar = currentChar;
+                }
+            } else if (!insideString && !insideRegex && isStartOfComment(currentChar, chars, index)) {
+                int newIndex = checkAndShift(currentChar, chars, index);
+                if (newIndex != index) {
+                    index = newIndex;
+                    continue;
+                }
+            }
+
+            result.append(currentChar);
+        }
+
+        return result.toString();
+    }
+
+    protected boolean isStartOrEndOfString (char currentChar, char[] chars, int currentIndex) {
+        return (currentIndex == 0 || chars[currentIndex - 1] != '\\' || so(chars, currentIndex)) &&
+               (currentChar == '"' || currentChar == '\'');
+    }
+
+    protected boolean isStartOfComment (char currentChar, char[] chars, int currentIndex) {
+        if (startOfComment == null || (currentIndex != 0 && chars[currentIndex - 1] == '\\')) {
+            return false;
+        }
+
+        return Stream.of(startOfComment).anyMatch(it -> {
+            if (chars.length - currentIndex < it.length()) {
+                return false;
+            }
+
+            for (int index = 0; index < it.length(); index++) {
+                if (it.charAt(index) != chars[currentIndex + index]) {
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 
     @Override
@@ -39,17 +99,12 @@ abstract class AbstractCommentRemover implements CommentRemover {
         return type;
     }
 
-    @Override
-    public String removeComments (String content) {
-        Matcher matcher = pattern.matcher(content);
-        while (matcher.find()) {
-            String token = matcher.group();
-            if (token.startsWith("\"") || token.startsWith("'")) {
-                continue;
+    private boolean so (char[] chars, int currentIndex) {
+        for (int count = 1; count <= currentIndex; count++) {
+            if (chars[currentIndex - count] != '\\') {
+                return (count - 1) % 2 == 0;
             }
-
-            content = content.replaceFirst(Pattern.quote(token), "");
         }
-        return content;
+        return false;
     }
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,6 +60,7 @@ class CommandCompress extends AbstractCommand {
     @Override
     @SneakyThrows
     public void execute (String[] arguments) {
+        val content = folder.getContent();
         val build = folder.getBuild();
         if (!Files.exists(build)) {
             log.info("Content was not built. Starting appropriate command...");
@@ -69,14 +70,15 @@ class CommandCompress extends AbstractCommand {
         val compressed = folder.getCompressed();
         FileSystemUtils.createNewDirectory(compressed);
 
-        Files.walk(build)
+        Files.walk(content)
                 .filter(it -> HTML_PATH_MATCHER.matches(it.getFileName()))
+                .map(it -> build.resolve(content.relativize(it)))
                 .forEach(it -> {
                     log.info("Compressing '{}'", it);
-                    String content = compressService.pack(it);
+                    String packed = compressService.pack(it);
                     Path outputFile = compressed.resolve(build.relativize(it));
                     log.info("Writing result to '{}'", outputFile);
-                    FileSystemUtils.write(outputFile, content);
+                    FileSystemUtils.write(outputFile, packed);
                 });
     }
 

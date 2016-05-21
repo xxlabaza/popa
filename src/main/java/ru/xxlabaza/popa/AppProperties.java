@@ -36,6 +36,9 @@ public class AppProperties {
 
     private Server server;
 
+    @Valid
+    private Style style;
+
     @Data
     public static class Folder {
 
@@ -75,5 +78,12 @@ public class AppProperties {
                           : to;
             }
         }
+    }
+
+    @Data
+    public static class Style {
+
+        @NotNull
+        private Integer lineBreak;
     }
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
  */
 package ru.xxlabaza.popa.pack.comment;
 
-import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 import static ru.xxlabaza.popa.pack.ContentType.CSS;
@@ -27,15 +26,17 @@ import static ru.xxlabaza.popa.pack.ContentType.CSS;
 @Service
 class CommentRemoverCss extends AbstractCommentRemover {
 
-    private final static Pattern PATTERN;
-
-    static {
-        PATTERN = Pattern.compile(
-                "(/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/)|\"(\\\\.|[^\\\\\"])*\"|'(\\\\[\\s\\S]|[^'])*'"
-        );
+    CommentRemoverCss () {
+        super(CSS, "/*");
     }
 
-    CommentRemoverCss () {
-        super(PATTERN, CSS);
+    @Override
+    protected int checkAndShift (char currentChar, char[] chars, int currentIndex) {
+        for (int subIndex = currentIndex + 2; subIndex < chars.length; subIndex++) {
+            if (chars[subIndex] == '*' && chars[subIndex + 1] == '/') {
+                return subIndex + 1;
+            }
+        }
+        return currentIndex;
     }
 }

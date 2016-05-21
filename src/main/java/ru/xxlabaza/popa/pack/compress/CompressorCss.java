@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2016 Artem Labazin <xxlabaza@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,8 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
 import java.io.Reader;
 import java.io.Writer;
 import lombok.SneakyThrows;
+import lombok.val;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.xxlabaza.popa.pack.ContentType;
 
@@ -31,11 +33,14 @@ import static ru.xxlabaza.popa.pack.ContentType.CSS;
 @Service
 class CompressorCss implements Compressor {
 
+    @Value("${app.style.lineBreak}")
+    private int lineBreak;
+
     @Override
     @SneakyThrows
     public void compress (Reader reader, Writer writer) {
-        CssCompressor compressor = new CssCompressor(reader);
-        compressor.compress(writer, 80);
+        val compressor = new CssCompressor(reader);
+        compressor.compress(writer, lineBreak);
     }
 
     @Override
